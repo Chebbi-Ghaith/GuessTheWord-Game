@@ -28,6 +28,7 @@ const wordlist = [
   "bios",
   "dhcp",
 ];
+
 const randomWord = wordlist[Math.floor(Math.random() * wordlist.length)];
 console.log(randomWord);
 //start of div creations
@@ -78,7 +79,10 @@ function generateInput() {
 }
 //start of game logic
 const guessButton = document.querySelector(".check");
-guessButton.addEventListener("click", handleGuesses);
+if (currentTry <= numberOfTries) {
+  guessButton.addEventListener("click", handleGuesses);
+}
+
 function handleGuesses() {
   let RightGuess = true;
 
@@ -99,9 +103,60 @@ function handleGuesses() {
       RightGuess = false;
     }
   }
+
   //Check if user win or lose
   if (RightGuess) {
+    Swal.fire({
+      title: "You Win after " + currentTry + " tries",
+      width: 600,
+      padding: "3em",
+      color: "#716add",
+      background:
+        "#fff url(https://media.tenor.com/ZoZqWaSnN5UAAAAi/diwali-sparkles-stars.gif)",
+      backdrop: `
+        rgba(0,0,123,0.4)
+        url("https://media.tenor.com/FAIxgHJ6oX4AAAAi/white-chicken.gif")
+        center top
+        no-repeat
+      `,
+    });
+    let allTries = document.querySelectorAll(".try-area div");
+    allTries.forEach((tryDiv) => tryDiv.classList.add("disabled-inputs"));
+    guessButton.disabled = true;
   } else {
+    document
+      .querySelector(`.try-${currentTry}`)
+      .classList.add("disabled-inputs");
+    const currentTryInputs = document.querySelectorAll(
+      `.try-${currentTry} input`
+    );
+    currentTryInputs.forEach((input) => (input.disabled = true));
+    currentTry++;
+    if (currentTry <= numberOfTries) {
+      document
+        .querySelector(`.try-${currentTry}`)
+        .classList.remove("disabled-inputs");
+      nextTryInputs = document.querySelectorAll(`.try-${currentTry} input`);
+      nextTryInputs.forEach((input) => (input.disabled = false));
+      nextTryInputs[0].focus();
+    }
+    if (currentTry === numberOfTries + 1) {
+      Swal.fire({
+        title: "You Lose",
+        width: 600,
+        padding: "3em",
+        color: "#FFF",
+        background:
+          "#fff url(https://media1.tenor.com/m/VuTjsUwod9cAAAAC/mood-aesthetic.gif)",
+        backdrop: `
+        rgba(0,0,123,0.4)
+        url(https://media1.tenor.com/m/FhF7cOauHTcAAAAC/oyun-bitti-loser.gif)
+        top
+        no-repeat
+      `,
+      });
+      guessButton.disabled = true;
+    }
   }
 }
 window.onload = function () {
