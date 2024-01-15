@@ -5,6 +5,9 @@ document.querySelector(
   "footer"
 ).innerHTML = `${gameName} Game created by Chebbi Ghaith <3`;
 document.querySelector("h1").innerHTML = gameName;
+
+//setting game options
+
 let numberOfTries = 3;
 let numberOfletters = 4;
 let currentTry = 1;
@@ -28,9 +31,13 @@ const wordlist = [
   "bios",
   "dhcp",
 ];
-
 const randomWord = wordlist[Math.floor(Math.random() * wordlist.length)];
-console.log(randomWord);
+
+//start of hint logic
+let numberOfHints = 2;
+document.querySelector(".hint").innerHTML = ` ${numberOfHints} Hint`;
+const hintButton = document.querySelector(".hint");
+hintButton.addEventListener("click", handleHint);
 //start of div creations
 function generateInput() {
   const inputsContainer = document.querySelector(".try-area");
@@ -77,7 +84,9 @@ function generateInput() {
     });
   });
 }
+
 //start of game logic
+
 const guessButton = document.querySelector(".check");
 if (currentTry <= numberOfTries) {
   guessButton.addEventListener("click", handleGuesses);
@@ -123,6 +132,7 @@ function handleGuesses() {
     let allTries = document.querySelectorAll(".try-area div");
     allTries.forEach((tryDiv) => tryDiv.classList.add("disabled-inputs"));
     guessButton.disabled = true;
+    hintButton.disabled = true;
   } else {
     document
       .querySelector(`.try-${currentTry}`)
@@ -132,6 +142,7 @@ function handleGuesses() {
     );
     currentTryInputs.forEach((input) => (input.disabled = true));
     currentTry++;
+
     if (currentTry <= numberOfTries) {
       document
         .querySelector(`.try-${currentTry}`)
@@ -156,6 +167,32 @@ function handleGuesses() {
       `,
       });
       guessButton.disabled = true;
+      hintButton.disabled = true;
+    }
+  }
+}
+
+//handle hint function
+function handleHint() {
+  if (numberOfHints > 1) {
+    numberOfHints--;
+    document.querySelector(".hint").innerHTML = ` ${numberOfHints} Hint`;
+  } else {
+    document.querySelector(".hint").innerHTML = ` No Hint`;
+    hintButton.disabled = true;
+  }
+  const enabledInputs = document.querySelectorAll(
+    ".try-area input:not([disabled])"
+  );
+  const emptyEnabledInputs = Array.from(enabledInputs).filter(
+    (input) => input.value === ""
+  );
+  if (emptyEnabledInputs.length > 0) {
+    const RandomIndex = Math.floor(Math.random() * emptyEnabledInputs.length);
+    const RandomInput = emptyEnabledInputs[RandomIndex];
+    const indexToFill = Array.from(enabledInputs).indexOf(RandomInput);
+    if (indexToFill !== -1) {
+      RandomInput.value = randomWord[RandomIndex].toUpperCase();
     }
   }
 }
